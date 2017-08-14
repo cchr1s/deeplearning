@@ -1,7 +1,7 @@
 ## Research on Logo Recognition Based on Deep Learning
 
 > A web system to display experimental result
-> use nodejs in backend and jade template in frontend
+use nodejs in backend and jade template in frontend
 
 ## Build Setup
 
