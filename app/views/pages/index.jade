@@ -1,0 +1,100 @@
+extends ../layout
+
+block content
+	.content
+		h1 基于深度学习的Logo识别系统
+		#init
+			.form-group
+				p 点击上传图片
+				a(href="#").file 选择图片
+					input#file(type="file", name="file")
+				button#upload 提交		
+		#up(hidden)
+			button#reupload 重新上传
+			.show
+				.imgup
+					.title 预览
+					button#train 训练
+					img#imgup(src="", alt="")
+				.imgback 
+					.title 结果
+					img#imgback(src="", alt="")
+
+	script.
+		$(document).ready(function() {
+			$('#upload').on("click",function () {
+				uploadFile();
+			});
+
+			$("#train").on('click', function() {
+				$(this).html('训练中...')
+				$(this).attr('disabled', true)
+				$(this).css('background', '#aaa')
+				trainFile()
+			})
+
+			$('#reupload').on('click', function(){
+				setTimeout(function(){
+					window.location.reload();
+				}, 200)
+			})
+		})
+
+		function uploadFile(){
+			var file = document.getElementById("file")
+			var formData = new FormData();
+			formData.append('file', file.files[0]);
+			$.ajax({
+				url: '/upload',
+				type: 'POST',
+				data: formData,
+				// async: false,
+				cache: false,
+				contentType: false,
+				processData: false,
+				success: function(data){
+					if(200 === data.code) {
+						console.log(data)
+						$('#init').hide()
+						$('#up').show()
+						$('#imgup').attr('src',data.data);
+					} else {
+
+					}
+					console.log('imgUploader upload success');
+				},
+				error: function(){
+					$("#result").html("与服务器通信发生错误");
+				}
+			});
+		}
+
+		function trainFile(){
+			var port = 3000
+			$.ajax({
+				url: 'http://127.0.0.1:' + port + '/data',
+				type: 'GET',
+				dataType: 'json',
+				success: function(data){
+					console.log(data)
+					$('#imgback').attr('src', data.url)
+					$('#train').html('训练')
+					$('#train').css('background', 'salmon')
+				},
+				error: function(err){
+					console.log(err)
+				}
+			})
+
+			$.ajax({
+				url: 'http://127.0.0.1:' + port + '/data',
+				type: 'POST',
+				data: {'execute': true},
+				success: function(data){
+					console.log(data)
+				},
+				error: function(err){
+					console.log(err)
+				}
+			})
+		}
