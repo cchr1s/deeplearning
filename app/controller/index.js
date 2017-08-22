@@ -22,8 +22,8 @@ var upload = multer({
     storage: storage
 })
 
-function execute(){
-    exec('python ../../../tools/demo.py --img '+imgname[0]+' ', function(err, stdout,stdout){
+function execute(net){
+    exec('python ../../../tools/demo.py --img '+imgname[0]+' '+'--net '+ net +' ', function(err, stdout,stdout){
         if(err) console.log(err)
         //console.log(imgname[0])
         console.log(stdout)
@@ -50,7 +50,10 @@ module.exports = (router) => {
         }
 
         if(req.body.execute){
-            execute()
+            execute(req.body.net)
         }
+        //console.log(req.body.net)
+
+        //res.json({url : "http://localhost:3000/result.jpg"})
     })
 } 

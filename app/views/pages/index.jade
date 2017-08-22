@@ -14,6 +14,14 @@ block content
 			.show
 				.imgup
 					.title 预览
+					.dropdown
+						button.btn.btn-default.dropdown-toggle(data-toggle="dropdown" aria-haspopup="true" aria-expanded="true") 选择网络
+							span.caret
+						ul.dropdown-menu(aria-labelledby="dropdownMenu1")
+							li 
+								a(href="#") ZF
+							li 
+								a(href="#") vgg16	
 					button#train 训练
 					img#imgup(src="", alt="")
 				.imgback 
@@ -25,12 +33,18 @@ block content
 			$('#upload').on("click",function () {
 				uploadFile();
 			});
+			
+			chooseNet()
 
 			$("#train").on('click', function() {
-				$(this).html('训练中...')
-				$(this).attr('disabled', true)
-				$(this).css('background', '#aaa')
-				trainFile()
+				if($('.dropdown-toggle').text().substr(0,4) == '选择网络'){
+					alert('请选择网络')
+				}else{
+					$(this).html('训练中...')
+					$(this).attr('disabled', true)
+					$(this).css('background', '#aaa')
+					trainFile()
+				}
 			})
 
 			$('#reupload').on('click', function(){
@@ -69,10 +83,17 @@ block content
 			});
 		}
 
+		function chooseNet(){
+			$('ul li').on('click', function(){
+				$('.dropdown-toggle').css('font-weight', 'bold')
+				$('.dropdown-toggle').html($(this).text())
+			})
+		}
+
 		function trainFile(){
 			var port = 3000
 			$.ajax({
-				url: 'http://127.0.0.1:' + port + '/data',
+				url: 'http://127.0.0.1:' + port + '/data?get='+Math.random(),
 				type: 'GET',
 				dataType: 'json',
 				success: function(data){
@@ -80,6 +101,7 @@ block content
 					$('#imgback').attr('src', data.url)
 					$('#train').html('训练')
 					$('#train').css('background', 'salmon')
+					$('#train').attr('disabled', false)
 				},
 				error: function(err){
 					console.log(err)
@@ -89,7 +111,10 @@ block content
 			$.ajax({
 				url: 'http://127.0.0.1:' + port + '/data',
 				type: 'POST',
-				data: {'execute': true},
+				data: {
+					'execute': true,
+					'net' : $('.dropdown-toggle').text()
+				},
 				success: function(data){
 					console.log(data)
 				},
